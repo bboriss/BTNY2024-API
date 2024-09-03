@@ -1,31 +1,11 @@
-import mongoose, { Schema, Document } from 'mongoose';
+const { Schema, model } = require('mongoose');
 
-interface ILocation {
-  type: string;
-  coordinates: number[];
-}
-
-export interface ITour extends Document {
-  tripduration: number;
-  startStationId: number;
-  startStationName: string;
-  endStationId: number;
-  endStationName: string;
-  bikeid: number;
-  usertype: string;
-  birthYear: number;
-  startStationLocation: ILocation;
-  endStationLocation: ILocation;
-  startTime: Date;
-  stopTime: Date;
-}
-
-const LocationSchema: Schema = new Schema({
+const LocationSchema = new Schema({
   type: { type: String, required: true },
   coordinates: { type: [Number], required: true },
 });
 
-const TourSchema: Schema = new Schema({
+const TourSchema = new Schema({
   tripduration: { type: Number, required: true },
   startStationId: { type: Number, required: true },
   startStationName: { type: String, required: true },
@@ -40,4 +20,6 @@ const TourSchema: Schema = new Schema({
   stopTime: { type: Date, required: true },
 });
 
-export default mongoose.model<ITour>('Tour', TourSchema, 'trips');
+const Tour = model('Tour', TourSchema, 'trips');
+
+module.exports = Tour;

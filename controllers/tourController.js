@@ -1,25 +1,24 @@
-import { Request, Response } from 'express';
-import Tour from '../models/Tour';
+const Tour = require('../models/Tour.js');
 
-export const getAllTours = async (req: Request, res: Response) => {
+const getAllTours = async (req, res) => {
   try {
     const { search, sort, page = '1', limit = '5' } = req.query;
 
-    let query: any = {};
+    let query = {};
 
     if (search) {
       query['start station name'] = { $regex: search, $options: 'i' };
     }
 
-    let sortOption: any = {};
+    let sortOption = {};
     if (sort === 'shortest') {
       sortOption.tripduration = 1;
     } else if (sort === 'longest') {
       sortOption.tripduration = -1;
     }
 
-    const currentPage = parseInt(page as string, 10) || 1;
-    const perPage = parseInt(limit as string, 10) || 5;
+    const currentPage = parseInt(page, 10) || 1;
+    const perPage = parseInt(limit, 10) || 5;
 
     const skip = (currentPage - 1) * perPage;
 
@@ -41,7 +40,7 @@ export const getAllTours = async (req: Request, res: Response) => {
   }
 };
 
-export const getTourById = async (req: Request, res: Response) => {
+const getTourById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -55,4 +54,9 @@ export const getTourById = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
+};
+
+module.exports = {
+  getAllTours,
+  getTourById
 };

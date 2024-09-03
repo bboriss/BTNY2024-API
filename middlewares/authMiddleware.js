@@ -1,12 +1,9 @@
-/// <reference path="../types/express.d.ts" />
-
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
+const jwt = require('jsonwebtoken');
+const User = require('../models/User.js');
 
 const secret = process.env.JWT_SECRET || 'my_jwt_secret';
 
-export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
+const authenticateUser = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -16,7 +13,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded: any = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.id).select('-password');
 
     if (!user) {
@@ -26,11 +23,15 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
     req.user = {
       id: user._id.toString(),
       username: user.username,
-      role: user.role as 'admin' | 'user',
+      role: user.role,
     };
 
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
+};
+
+module.exports = {
+  authenticateUser
 };

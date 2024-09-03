@@ -1,19 +1,18 @@
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
+const jwt = require('jsonwebtoken');
+const User = require('../models/User.js');
 
 const secret = process.env.JWT_SECRET || 'my_jwt_secret';
 const refreshSecret = process.env.JWT_REFRESH_SECRET || 'my_refresh_jwt_secret';
 
-const createToken = (id: string, expiresIn: string) => {
+const createToken = (id, expiresIn) => {
   return jwt.sign({ id }, secret, { expiresIn });
 };
 
-const createRefreshToken = (id: string) => {
+const createRefreshToken = (id) => {
   return jwt.sign({ id }, refreshSecret, { expiresIn: '7d' });
 };
 
-export const register = async (req: Request, res: Response) => {
+const register = async (req, res) => {
   const { firstName, lastName, username, email, password, role } = req.body;
   try {
     const newUser = new User({ firstName, lastName, username, email, password, role });
@@ -36,7 +35,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+const login = async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await User.findOne({ username }).select('+password');
@@ -61,7 +60,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const refreshToken = async (req: Request, res: Response) => {
+const refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
@@ -69,7 +68,7 @@ export const refreshToken = async (req: Request, res: Response) => {
   }
 
   try {
-    const decoded: any = jwt.verify(refreshToken, refreshSecret);
+    const decoded = jwt.verify(refreshToken, refreshSecret);
     const userId = decoded.id;
 
     const user = await User.findById(userId);
@@ -90,4 +89,10 @@ export const refreshToken = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(403).json({ message: 'Invalid refresh token' });
   }
+};
+
+module.exports = {
+  register,
+  login,
+  refreshToken
 };
