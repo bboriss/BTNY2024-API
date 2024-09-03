@@ -14,7 +14,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
+app.use(cors('*'));
 app.use(helmet());
 app.use(morgan('tiny'));
 
